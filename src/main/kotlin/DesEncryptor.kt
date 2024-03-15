@@ -1,6 +1,6 @@
 /**
- * RPT - Right Plain Text
- * LPT - Left Plain Text
+ * The class implements the encryption leveraging the DES algorithm.
+ * The Data Encryption Standard is a symmetric-key algorithm for the encryption of digital data.
  */
 class DesEncryptor {
 
@@ -14,7 +14,62 @@ class DesEncryptor {
     }
 
     private val keyPermutation = intArrayOf(
-        57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36, 63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4
+        57,
+        49,
+        41,
+        33,
+        25,
+        17,
+        9,
+        1,
+        58,
+        50,
+        42,
+        34,
+        26,
+        18,
+        10,
+        2,
+        59,
+        51,
+        43,
+        35,
+        27,
+        19,
+        11,
+        3,
+        60,
+        52,
+        44,
+        36,
+        63,
+        55,
+        47,
+        39,
+        31,
+        23,
+        15,
+        7,
+        62,
+        54,
+        46,
+        38,
+        30,
+        22,
+        14,
+        6,
+        61,
+        53,
+        45,
+        37,
+        29,
+        21,
+        13,
+        5,
+        28,
+        20,
+        12,
+        4
     )
 
     private val keyShiftsPerRound = intArrayOf(1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1)
@@ -116,7 +171,7 @@ class DesEncryptor {
 
         val binary = StringBuilder()
         hex.forEach {
-            binary.append(hexToBinMapper[it]?.uppercase() ?: "")
+            binary.append(hexToBinMapper[it] ?: "")
         }
 
         return binary.toString()
@@ -220,7 +275,13 @@ class DesEncryptor {
         return keyTemp
     }
 
-    fun generateKeys(key: String): List<String> {
+    /**
+     * Generates the keys for each round of the algorithm based on the input [key].
+     *
+     * @param key the hexadecimal key
+     * @return the list of binary keys
+     */
+    private fun generateKeys(key: String): List<String> {
         val keyBin = hexToBin(key)
 
         // reduce the 64-bit key to the 56-bit key by ignoring every eighth bit
@@ -248,16 +309,24 @@ class DesEncryptor {
         return roundKeysBinary
     }
 
-    fun encrypt(input: String, roundKeysBinary: List<String>): String {
-        var inputBin = hexToBin(input)
+    /**
+     * Encrypts the [message][text] using the DES algorithm.
+     *
+     * @param text the message in hexadecimal numeric system
+     * @param key the hexadecimal key
+     * @return the encrypted message in hexadecimal format
+     */
+    fun encrypt(text: String, key: String): String {
+        val roundKeysBinary = generateKeys(key)
+        var inputBin = hexToBin(text)
 
         // initial permutation
         inputBin = permute(inputBin, initialPermutation, BITS_64)
         println("After initial permutation: ${binToHex(inputBin)}")
 
         // split into LPT and RPT
-        val lpt = inputBin.substring(0, BITS_32)
-        val rpt = inputBin.substring(BITS_32, BITS_64)
+        val lpt = inputBin.substring(0, BITS_32) // RPT - Right Plain Text
+        val rpt = inputBin.substring(BITS_32, BITS_64) // LPT - Left Plain Text
         var lptTemp = lpt
         var rptTemp = rpt
 
@@ -284,4 +353,17 @@ class DesEncryptor {
 
         return binToHex(cipherText)
     }
+
+    object Helper {
+        fun strToHex(text: String): String {
+            val tmp = if (text.length < 8) text.padEnd(8, ' ') else text
+            return tmp
+                .toByteArray().joinToString("") { byte ->
+                    "%02x".format(byte) // converts the byte to its corresponding hex value
+                }
+                .uppercase()
+        }
+
+    }
+
 }

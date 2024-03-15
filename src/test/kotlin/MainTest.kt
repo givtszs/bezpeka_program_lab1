@@ -9,9 +9,8 @@ class DesEncryptorTest {
         val text = "0123456789ABCDEF"
         val key = "FEFEFEFEFEFEFEFE"
         val expected = "6DCE0DC9006556A3"
-        val keys = encryptor.generateKeys(key)
 
-        val result = encryptor.encrypt(text, keys)
+        val result = encryptor.encrypt(text, key)
 
         assertThat(result).isEqualTo(expected)
     }
@@ -21,9 +20,8 @@ class DesEncryptorTest {
         val text = "0000000000000000"
         val key = "0000000000000000"
         val expected = "8CA64DE9C1B123A7"
-        val keys = encryptor.generateKeys(key)
 
-        val result = encryptor.encrypt(text, keys)
+        val result = encryptor.encrypt(text, key)
 
         assertThat(result).isEqualTo(expected)
     }
@@ -33,10 +31,57 @@ class DesEncryptorTest {
         val text = "0123456789ABCDEF"
         val key = "FEDCBA9876543210"
         val expected = "ED39D950FA74BCC4"
-        val keys = encryptor.generateKeys(key)
 
-        val result = encryptor.encrypt(text, keys)
+        val result = encryptor.encrypt(text, key)
 
         assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun encryptSurname() {
+        val encryptor = DesEncryptor()
+        val text = "havrysh"
+        val key = "password"
+        val textHex = DesEncryptor.Helper.strToHex(text)
+        println(textHex)
+        val keyHex = DesEncryptor.Helper.strToHex(key)
+        println(keyHex)
+
+        val result = encryptor.encrypt(textHex, keyHex)
+        println(result)
+
+        assertThat(result).isNotEmpty()
+    }
+
+    @Test
+    fun encryptName() {
+        val encryptor = DesEncryptor()
+        val text = "ivan"
+        val key = "password"
+        val textHex = DesEncryptor.Helper.strToHex(text)
+        println(textHex)
+        val keyHex = DesEncryptor.Helper.strToHex(key)
+        println(keyHex)
+
+        val result = encryptor.encrypt(textHex, keyHex)
+        println(result)
+
+        assertThat(result).isNotEmpty()
+    }
+
+    @Test
+    fun encryptMiddleName() {
+        val encryptor = DesEncryptor()
+        val text = "vasylovy"
+        val key = "password"
+        val textHex = DesEncryptor.Helper.strToHex(text)
+        println(textHex)
+        val keyHex = DesEncryptor.Helper.strToHex(key)
+        println(keyHex)
+
+        val result = encryptor.encrypt(textHex, keyHex)
+        println(result)
+
+        assertThat(result).isNotEmpty()
     }
 }

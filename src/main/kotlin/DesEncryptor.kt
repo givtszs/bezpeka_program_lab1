@@ -2,7 +2,14 @@
  * The class implements the encryption leveraging the DES algorithm.
  * The Data Encryption Standard is a symmetric-key algorithm for the encryption of digital data.
  */
-class DesEncryptor {
+class DesEncryptor(
+    var rounds: Int = 16
+) {
+    init {
+        if (rounds < 1 || rounds > 16) {
+            rounds = 16
+        }
+    }
 
     companion object {
         private const val BITS_64 = 64
@@ -11,6 +18,7 @@ class DesEncryptor {
         private const val KEY_BITS_56 = 56
         private const val ROUNDS = 16
         private const val S_BOXES = 8
+        private const val MAX_WORD_LENGTH = 8
     }
 
     private val keyPermutation = intArrayOf(
@@ -292,7 +300,7 @@ class DesEncryptor {
         var right = key56.substring(KEY_BITS_56 / 2, KEY_BITS_56)
 
         val roundKeysBinary = mutableListOf<String>()
-        repeat(ROUNDS) { i ->
+        repeat(rounds) { i ->
             // shifting the bits by n-th shifts by checking from shift table
             left = shiftLeft(left, keyShiftsPerRound[i])
             right = shiftLeft(right, keyShiftsPerRound[i])
@@ -322,7 +330,7 @@ class DesEncryptor {
 
         // initial permutation
         inputBin = permute(inputBin, initialPermutation, BITS_64)
-        println("After initial permutation: ${binToHex(inputBin)}")
+//        println("After initial permutation: ${binToHex(inputBin)}")
 
         // split into LPT and RPT
         val lpt = inputBin.substring(0, BITS_32) // RPT - Right Plain Text
@@ -331,7 +339,7 @@ class DesEncryptor {
         var rptTemp = rpt
 
         // 16 rounds of encryption
-        repeat(ROUNDS) { i ->
+        repeat(rounds) { i ->
             val functionResult = roundFunction(rptTemp, roundKeysBinary[i])
 
             // XOR the LPT with the straight permutation result
@@ -342,7 +350,7 @@ class DesEncryptor {
                 lptTemp = rptTemp.also { rptTemp = lptTemp }
             }
 
-            println("Round ${i + 1} ${binToHex(lptTemp)} ${binToHex(rptTemp)}")
+//            println("Round ${i + 1} ${binToHex(lptTemp)} ${binToHex(rptTemp)}")
         }
 
         // concatenate the LPT with the RPT
@@ -354,16 +362,29 @@ class DesEncryptor {
         return binToHex(cipherText)
     }
 
+    fun encrypt(input: List<String>, key: String): List<String> {
+        val result = mutableListOf<String>()
+        input.forEach { str ->
+            result.add(encrypt(str, key))
+        }
+        return result
+    }
+
     object Helper {
-        fun strToHex(text: String): String {
-            val tmp = if (text.length < 8) text.padEnd(8, ' ') else text
-            return tmp
-                .toByteArray().joinToString("") { byte ->
-                    "%02x".format(byte) // converts the byte to its corresponding hex value
-                }
-                .uppercase()
+        fun strToHexList(text: String): List<String> {
+            val textSplit = mutableListOf<String>()
+            for (i in text.indices step MAX_WORD_LENGTH) {
+                val hex = text.substring(i, (i + MAX_WORD_LENGTH).coerceAtMost(text.length)).toHex()
+                textSplit.add(hex)
+            }
+            return textSplit
         }
 
+        fun String.toHex(): String {
+            return padEnd(MAX_WORD_LENGTH, ' ').toByteArray().joinToString("") { byte ->
+                "%02x".format(byte) // converts the byte to its corresponding hex value
+            }.uppercase()
+        }
     }
 
 }

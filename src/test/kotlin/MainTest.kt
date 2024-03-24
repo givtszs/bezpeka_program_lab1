@@ -1,3 +1,4 @@
+import DesEncryptor.Helper.toHex
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
 
@@ -40,14 +41,12 @@ class DesEncryptorTest {
     @Test
     fun encryptSurname() {
         val encryptor = DesEncryptor()
-        val text = "havrysh"
+        val name = "Havrysh"
         val key = "password"
-        val textHex = DesEncryptor.Helper.strToHex(text)
-        println(textHex)
-        val keyHex = DesEncryptor.Helper.strToHex(key)
-        println(keyHex)
+        val nameHex = name.toHex()
+        val keyHex = key.toHex()
 
-        val result = encryptor.encrypt(textHex, keyHex)
+        val result = encryptor.encrypt(nameHex, keyHex)
         println(result)
 
         assertThat(result).isNotEmpty()
@@ -56,14 +55,12 @@ class DesEncryptorTest {
     @Test
     fun encryptName() {
         val encryptor = DesEncryptor()
-        val text = "ivan"
+        val name = "Ivan"
         val key = "password"
-        val textHex = DesEncryptor.Helper.strToHex(text)
-        println(textHex)
-        val keyHex = DesEncryptor.Helper.strToHex(key)
-        println(keyHex)
+        val nameHex = name.toHex()
+        val keyHex = key.toHex()
 
-        val result = encryptor.encrypt(textHex, keyHex)
+        val result = encryptor.encrypt(nameHex, keyHex)
         println(result)
 
         assertThat(result).isNotEmpty()
@@ -72,15 +69,14 @@ class DesEncryptorTest {
     @Test
     fun encryptMiddleName() {
         val encryptor = DesEncryptor()
-        val text = "vasylovy"
+        val name = "Vasylovych"
         val key = "password"
-        val textHex = DesEncryptor.Helper.strToHex(text)
-        println(textHex)
-        val keyHex = DesEncryptor.Helper.strToHex(key)
-        println(keyHex)
+        val nameHex = DesEncryptor.Helper.strToHexList(name)
+        println("Middle name hex: $nameHex")
+        val keyHex = key.toHex()
 
-        val result = encryptor.encrypt(textHex, keyHex)
-        println(result)
+        val result = encryptor.encrypt(nameHex, keyHex)
+        println("Encrypted: $result")
 
         assertThat(result).isNotEmpty()
     }
